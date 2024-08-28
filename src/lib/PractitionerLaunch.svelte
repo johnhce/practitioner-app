@@ -102,10 +102,6 @@
 
 <div>
   {#if token}
-Token = {JSON.stringify(token)}<br/>
-Token.NPB = {JSON.stringify(token.need_patient_banner)}<br/>
-<!-- iss = {JSON.stringify(iss)}<br/>
-launch = {JSON.stringify(launch)}<br/> -->
     {#if token.need_patient_banner}
       <PatientBanner accessToken={token.access_token}
                      patientId={token.patient}

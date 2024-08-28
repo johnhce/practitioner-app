@@ -1,12 +1,10 @@
 <script lang="ts">
   import axios from "axios";
-//  import { FHIR_BASE_URL } from "../config";
   import { add, formatRelative, subDays } from 'date-fns'
   import type { Bundle, BundleEntry, MedicationRequest, Observation, OperationOutcome } from "fhir/r4";
 
   import { Column, Spinner, Table } from "@sveltestrap/sveltestrap";
   import { DataTable, Pagination } from "carbon-components-svelte";
-  import { te } from "date-fns/locale";
 
   export let accessToken: string
   export let baseURL: string
@@ -22,12 +20,6 @@
   let pageSize = 10;
   let page = 1;
   let rows:Array<TableEntry> = [];
-  // Array.from({ length: 25 }).map((_, i) => ({
-  //   id: i,
-  //   name: "Load Balancer " + (i + 1),
-  //   date: "HTTP",
-  //   val: 3000 + i * 10,
-  // }));
 
   const getLabResults = async () => {
     const labObservationResponse = await axios.get<Bundle<Observation | OperationOutcome>>(`${baseURL}/Observation`, {
@@ -45,13 +37,6 @@
 //        'Prefer': 'pagination=offset-skip',
       }
     })
-//    initTableData(labObservationResponse.data);
-  // rows = Array.from({ length: 10 }).map((_, i) => ({
-  //   id: i,
-  //   name: labObservationResponse.data,//:String,
-  //   date: "HTTP",
-  //   val: 3000 + i * 10,
-  // }));
   let entries = getObservationEntries(labObservationResponse.data);
   for(let i = 0; i < entries.length; i++) {
     let te = {} as TableEntry;
@@ -64,11 +49,6 @@
       te.date = '';
     te.val = getObservationDisplay(entries[i].resource)?.toString();
     rows.push(te);
-//     rows.push({
-//       name: entries[i].resource?.code?.text,
-// //      date: formatRelative(new Date(entries[i]?.resource.effectiveDateTime), new Date()),
-//       val: getObservationDisplay(entries[i].resource),
-//     });
   }
 
     return labObservationResponse.data
@@ -106,31 +86,6 @@
     })
     
   }
-
-  const initTableData = (labResults:Bundle<Observation | OperationOutcome>) => {
-    let n = 0;
-//    rows[n].id = n;
-    // try { rows[n].name = JSON.stringify(labResults.entry); } catch(ex) {alert(ex);}
-    // try { rows[n].date = JSON.stringify(labResults.entry?.entries); } catch(ex) {alert(ex);}
-    // try { rows[n].val = JSON.stringify(labResults.entry?.entries.toString); } catch(ex) {alert(ex);}
-    n++;
-    // (Object.keys(labResults) as (keyof typeof labResults)[]).forEach((key, index) => {
-    //   let observation:BundleEntry<Observation | OperationOutcome> = labResults[key];
-    //   rows.add({
-    //      name: observation.resource?.code?.text,
-    //      date: formatRelative(new Date(observation?.resource.effectiveDateTime), new Date()),
-    //      val: getObservationDisplay(observation.resource),
-    //   });
-    // });
-    //forEach ((observation:Observation | undefined) => {
-      // observationEntries:BundleEntry<Observation> = getObservationEntries(labResults);
-      // rows.add({
-      //   name: observation.resource?.code?.text,
-      //   date: formatRelative(new Date(observation?.resource.effectiveDateTime), new Date()),
-      //   val: getObservationDisplay(observation.resource),
-      // });
-    //});
-  }
 </script>
 <div class="mt-10 max-w-md mx-auto">
 {#await getLabResults()}
@@ -157,31 +112,5 @@
     totalItems={rows.length}
     pageSizeInputDisabled
   />
-
-  <!--
-  <Table rows={rows} let:row striped>
-    <Column header="Name">
-      {row.name}
-    </Column>
-    <Column header="Date">
-      {row.date}
-    </Column>
-    <Column header="Measurement">{row.val}</Column>
-  </Table>-->
-
-  <!-- {#each getObservationEntries(labResults) as observation, i}
-  <p>
-    <span class="font-medium">
-      {observation.resource?.code?.text}
-      {#if observation?.resource?.effectiveDateTime}
-        ({formatRelative(new Date(observation?.resource.effectiveDateTime), new Date())})
-      {/if}
-      :
-    </span>
-    {getObservationDisplay(observation.resource)}
-  </p>
-  <div class="ml-4">
-  </div>
-  {/each} -->
 {/await}
 </div>

@@ -23,8 +23,8 @@
   let vitalsHeightLengthValid: boolean
   let vitalsBMI: string = ''
   let vitalsBMIValid: boolean
-  let vitalsGlucose: string = ''
-  let vitalsGlucoseValid: boolean
+  let vitalsA1C: string = ''
+  let vitalsA1CValid: boolean
   let vitalsCreatinine: string = ''
   let vitalsCreatinineValid: boolean
   let vitalsPotassium: string = ''
@@ -34,142 +34,146 @@
 
   const formChanged = ():boolean => {
     return !(vitalsPulseValid || vitalsBodyTempValid || vitalsOxySaturationValid ||
-            vitalsWeightValid || vitalsHeightLengthValid || vitalsBMIValid || vitalsGlucoseValid ||
+            vitalsWeightValid || vitalsHeightLengthValid || vitalsBMIValid || vitalsA1CValid ||
             vitalsCreatinineValid || vitalsPotassiumValid);
   }
 
   const addVitals = async () => {
     // build update data structure
-    let vitalsResource = {
-      "resourceType": "Observation",
-      "status": "final",
-      "category": [
-        {
-          "coding": [
-            {
-              "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-              "code": "vital-signs",
-              "display": "Vital Signs"
-            }
-          ],
-          "text": "Vital Signs"
-        }
-      ],
-      "code": {
-        "coding": [
-          {
-            "system": "http://loinc.org",
-            "code": "8331-1"
-          }
-        ],
-        "text": "Temperature Oral"
-      },
-      "subject": {
-        "reference": `Patient/${patientId}`
-      },
-      "effectiveDateTime": new Date().toISOString(),
-      "valueQuantity": {
-        "value": vitalsBodyTemp,
-        "unit": "degC",
-        "system": "http://unitsofmeasure.org",
-        "code": "Cel"
-      },
-    }
+    let bodyTempResource = buildObservationJSON("8331-1", "Temperature Oral", vitalsBodyTemp, "degC", "Cel");
+//    let a1cResource = buildObservationJSON("4548-4", "Hemoglobin A1c", vitalsA1C, "percent", "%");
+    //   "resourceType": "Observation",
+    //   "status": "final",
+    //   "category": [
+    //     {
+    //       "coding": [
+    //         {
+    //           "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+    //           "code": "vital-signs",
+    //           "display": "Vital Signs"
+    //         }
+    //       ],
+    //       "text": "Vital Signs"
+    //     }
+    //   ],
+    //   "code": {
+    //     "coding": [
+    //       {
+    //         "system": "http://loinc.org",
+    //         "code": "8331-1"
+    //       }
+    //     ],
+    //     "text": "Temperature Oral"
+    //   },
+    //   "subject": {
+    //     "reference": `Patient/${patientId}`
+    //   },
+    //   "effectiveDateTime": new Date().toISOString(),
+    //   "valueQuantity": {
+    //     "value": vitalsBodyTemp,
+    //     "unit": "degC",
+    //     "system": "http://unitsofmeasure.org",
+    //     "code": "Cel"
+    //   },
+    // }
 
     // call REST service
-try {
-    const response = await axios.post(`${baseURL}/Observation`, 
-//      vitalsResource,
-{
-      "resourceType": "Observation",
-      "status": "final",
-      "category": [
+    try {
+      const response = await axios.post(`${baseURL}/Observation`, 
+        bodyTempResource,
         {
-          "coding": [
-            {
-              "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-              "code": "vital-signs",
-              "display": "Vital Signs"
-            }
-          ],
-          "text": "Vital Signs"
-        }
-      ],
-      "code": {
-        "coding": [
-          {
-            "system": "http://loinc.org",
-            "code": "8331-1"
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Accept': 'application/json',
           }
-        ],
-        "text": "Temperature Oral"
-      },
-      "subject": {
-        "reference": `Patient/${patientId}`
-      },
-      "effectiveDateTime": new Date().toISOString(),
-      "valueQuantity": {
-        "value": vitalsBodyTemp,
-        "unit": "degC",
-        "system": "http://unitsofmeasure.org",
-        "code": "Cel"
-      },
-    },
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Accept': 'application/json',
-        }
-      });
-} catch (error:any) {
-  if (error.response) {
-    // The request was made and the server responded with a status code
-    // that falls out of the range of 2xx
-    console.log(error.response.data);
-    console.log(error.response.status);
-    console.log(error.response.headers);
-  } else if (error.request) {
-    // The request was made but no response was received
-    console.log(error.request);
-  } else {
-    // Something happened in setting up the request that triggered an Error
-    console.log('Error', error.message);
-  }
-  console.log(error.config);
-}
+        });
+    } catch (error:any) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
+    }
     // fire an event to tell parent to refresh???
     //x BUT, parent page has a ref to another object which does the loading; fwd to that component???
     // dispatch('updateVitalsList');
     // for now, do a page reload
 //x    window.location.reload()
   }
+
+  const buildObservationJSON = (loincCode: string, loincCodeText: string, value: string,
+                                unit: string, unitOfMeasureCode: string): Object => {
+    return {
+      "resourceType": "Observation",
+      "status": "final",
+      "category": [
+        {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+              "code": "vital-signs",
+              "display": "Vital Signs"
+            }
+          ],
+          "text": "Vital Signs"
+        }
+      ],
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": loincCode,
+          }
+        ],
+        "text": loincCodeText,
+      },
+      "subject": {
+        "reference": `Patient/${patientId}`
+      },
+      "effectiveDateTime": new Date().toISOString(),
+      "valueQuantity": {
+        "value": value,
+        "unit": unit,
+        "system": "http://unitsofmeasure.org",
+        "code": unitOfMeasureCode
+      },
+    }
+  }
 </script>
 
 <div>
   <Modal autoFocus backdrop body={true} centered={false} fade fullscreen={false} header="Add Vitals"
-         isOpen={isModalOpen} keyboard={true} returnFocusAfterClose scrollable={false} size="xl"
+         isOpen={isModalOpen} keyboard={true} returnFocusAfterClose scrollable={false} size="md"
          unmountOnClose>
       <Form {validated} on:submit={(e) => e.preventDefault()}>
       <Container>
         <Row>
-          <Col>
-            <!-- <VitalsCardPulse bind:value={vitalsPulse} bind:isValid={vitalsPulseValid}/> -->
+          <!-- <Col>
             <VitalsCard title="Pulse" icon="heart-pulse" min={10} max={200} step={1}
                 unit="bpm" unitLongDesc="Beats per minute"
                 bind:value={vitalsPulse} bind:isValid={vitalsPulseValid} />
-          </Col>
+          </Col> -->
           <Col>
             <VitalsCard title="Body Temperature" icon="cup-hot" min={30} max={60} step={0.1}
                 unit="&deg;C" unitLongDesc="Temp in &deg;C"
                 bind:value={vitalsBodyTemp} bind:isValid={vitalsBodyTempValid}/>
           </Col>
-          <Col>
+          <!-- <Col>
             <VitalsCard title="Oxygen Saturation" icon="0-circle" min={60} max = {100} step = {0.1}
                 unit="%" unitLongDesc="Saturation percentage"
                 bind:value={vitalsOxySaturation} bind:isValid={vitalsOxySaturationValid}/>
-          </Col>
+          </Col> -->
         </Row>
-        <Row class="mt-2">
+        <!-- <Row class="mt-2">
           <Col>
             <VitalsCard title="Body Weight" icon="boxes" min={1} max = {600} step = {1}
                 unit="kg" unitLongDesc="Body Weight in kilograms"
@@ -188,9 +192,9 @@ try {
         </Row>
         <Row class="mt-2">
           <Col>
-            <VitalsCard title="Glucose" icon="box" min={1} max = {20} step = {0.1}
-                unit="mmol/L" unitLongDesc="Glucose (mmol/L)"
-                bind:value={vitalsGlucose} bind:isValid={vitalsGlucoseValid}/>
+            <VitalsCard title="A1C" icon="box" min={1} max = {20} step = {0.1}
+                unit="percent" unitLongDesc="A1C (%)"
+                bind:value={vitalsA1C} bind:isValid={vitalsA1CValid}/>
           </Col>
           <Col>
             <VitalsCard title="Creatinine" icon="c-circle" min={0} max = {5} step = {0.1}
@@ -202,7 +206,7 @@ try {
                 unit="g/dL" unitLongDesc="Potassium g/dL"
                 bind:value={vitalsPotassium} bind:isValid={vitalsPotassiumValid}/>
           </Col>
-        </Row>
+        </Row> -->
       </Container>
       <div class="mt-3" style="float:right">
         <Button color="primary" on:click="{() => {    // disabled="{formChanged}"
@@ -213,7 +217,7 @@ try {
               (vitalsWeightValid || vitalsWeight === '') &&
               (vitalsHeightLengthValid || vitalsHeightLength === '') &&
               (vitalsBMIValid || vitalsBMI === '') &&
-              (vitalsGlucoseValid || vitalsGlucose === '') &&
+              (vitalsA1CValid || vitalsA1C === '') &&
               (vitalsCreatinineValid || vitalsCreatinine === '') &&
               (vitalsPotassiumValid || vitalsPotassium === '')) {
             addVitals();
