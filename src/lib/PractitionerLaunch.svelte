@@ -22,7 +22,7 @@
 
   onMount(async () => {
     const launchUrl = new URL(window.location.href)
-    iss = launchUrl.searchParams.get('iss') || ''
+    iss = launchUrl.searchParams.get('iss') || 'https://fhir-ehr-code.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d'
     launch = launchUrl.searchParams.get('launch') || ''
 
     const tokenJSON = localStorage.getItem('token')
@@ -52,7 +52,7 @@
       //x for prod, keep a cache: map of issuer,smartConfig
 
       redirectUrl = await constructAuthUrl({authUrl: authEndpoint,
-        scopes: 'openid fhirUser launch user/Observation.read user/Onservation.write user/Patient.read user/Patient.write'});
+        scopes: 'openid fhirUser launch user/Observation.read user/Observation.write user/Patient.read user/Patient.write'});
       window.location.href = redirectUrl;
     }
   })
@@ -102,6 +102,10 @@
 
 <div>
   {#if token}
+Token = {JSON.stringify(token)}<br/>
+Token.NPB = {JSON.stringify(token.need_patient_banner)}<br/>
+<!-- iss = {JSON.stringify(iss)}<br/>
+launch = {JSON.stringify(launch)}<br/> -->
     {#if token.need_patient_banner}
       <PatientBanner accessToken={token.access_token}
                      patientId={token.patient}

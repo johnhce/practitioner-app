@@ -7,6 +7,11 @@
   import PractitionerLaunch from './lib/PractitionerLaunch.svelte';
   import { Button, ButtonGroup, Icon, Navbar, Spinner, TabContent, TabPane } from '@sveltestrap/sveltestrap';
   import { colorMode, useColorMode } from '@sveltestrap/sveltestrap';
+
+  onMount(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('code_verifier');
+  });
 </script>
 
 <svelte:head>

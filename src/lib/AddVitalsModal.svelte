@@ -149,7 +149,7 @@ try {
   <Modal autoFocus backdrop body={true} centered={false} fade fullscreen={false} header="Add Vitals"
          isOpen={isModalOpen} keyboard={true} returnFocusAfterClose scrollable={false} size="xl"
          unmountOnClose>
-    <Form {validated} on:submit={(e) => e.preventDefault()}>
+      <Form {validated} on:submit={(e) => e.preventDefault()}>
       <Container>
         <Row>
           <Col>
